@@ -1,0 +1,57 @@
+"0","#check cureent coordinate system now: units should be in m, good for distance calculations
+st_crs(states_eqdc)
+"
+"1","Coordinate Reference System:"
+"1","
+"
+"1","  User input:"
+"1"," "
+"1","+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"
+"1"," "
+"1","
+"
+"1","  wkt:
+"
+"1",""
+"1","PROJCRS[""unknown"",
+    BASEGEOGCRS[""unknown"",
+        DATUM[""North American Datum 1983"",
+            ELLIPSOID[""GRS 1980"",6378137,298.257222101,
+                LENGTHUNIT[""metre"",1]],
+            ID[""EPSG"",6269]],
+        PRIMEM[""Greenwich"",0,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8901]]],
+    CONVERSION[""unknown"",
+        METHOD[""Equidistant Conic"",
+            ID[""EPSG"",1119]],
+        PARAMETER[""Latitude of false origin"",40,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8821]],
+        PARAMETER[""Longitude of false origin"",-96,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8822]],
+        PARAMETER[""Latitude of 1st standard parallel"",20,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8823]],
+        PARAMETER[""Latitude of 2nd standard parallel"",60,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8824]],
+        PARAMETER[""Easting at false origin"",0,
+            LENGTHUNIT[""metre"",1],
+            ID[""EPSG"",8826]],
+        PARAMETER[""Northing at false origin"",0,
+            LENGTHUNIT[""metre"",1],
+            ID[""EPSG"",8827]]],
+    CS[Cartesian,2],
+        AXIS[""(E)"",east,
+            ORDER[1],
+            LENGTHUNIT[""metre"",1,
+                ID[""EPSG"",9001]]],
+        AXIS[""(N)"",north,
+            ORDER[2],
+            LENGTHUNIT[""metre"",1,
+                ID[""EPSG"",9001]]]]"
+"1",""
+"1","
+"

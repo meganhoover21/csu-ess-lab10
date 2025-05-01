@@ -1,0 +1,6 @@
+"0","remotes::install_github(""mikejohnson51/AOI"")"
+"2","Using github PAT from envvar GITHUB_PAT. Use `gitcreds::gitcreds_set()` and unset GITHUB_PAT in .Renviron (or elsewhere) if you want to use the more secure git credential store instead.
+"
+"2","Skipping install of 'AOI' from a github remote, the SHA1 (f821d499) has not changed since last install.
+  Use `force = TRUE` to force installation
+"
