@@ -20,6 +20,7 @@ library(AOI)
 library(gghighlight)
 library(ggrepel)
 library(knitr)
+library(flextable)
 ```
 
 
@@ -149,7 +150,108 @@ For 2.2 we are interested in calculating the distance of each USA city to the US
 # Union all state boundaries into a single polygon
 usa_union <- st_union(states_eqdc)
 
+# Convert to a MULTILINESTRING for border geometry
+usa_border <- st_cast(usa_union, "MULTILINESTRING")
+
+#Calculate distance from each city to national border (in kilometers)
+dist_to_border_m <- st_distance(cities_eqdc, usa_border) 
+cities_eqdc$dist_to_border_km <- as.numeric(dist_to_border_m) / 1000 #convert m to km
+
+# Create a summary table of the 5 most inland cities
+top5_far_cities <- cities_eqdc %>%
+  arrange(desc(dist_to_border_km)) %>%
+  slice(1:5) %>%
+  select(city, state_id, dist_to_border_km)
+
+flextable(top5_far_cities)
+
+```
+
+
+# 2.2 - Distance to States (km)
+
+For 2.1 we are interested in calculating the distance of each city to the nearest state boundary. To do this we need all states to act as single unit. Convert the USA state boundaries to a MULTILINESTRING geometry in which the state boundaries are preserved (not resolved). In addition to storing this distance data as part of the cities data.frame, produce a table (flextable) documenting the five cities farthest from a state border. Include only the city name, state, and distance.
+```{r}
+#Use st_combine() instead of st_union() (so borders between states remain),
+#Convert the result to MULTILINESTRING to represent all state boundaries,
+#Then compute distances from cities to those lines.
+
+# Combine geometries without resolving internal boundaries
+state_borders <- states_eqdc %>%
+  st_combine() %>%
+st_cast("MULTILINESTRING") #represents all state lines, including interior borders.
+
+
+#Calculate distance from each city to the nearest state boundary
+dist_to_state_border_m <- st_distance(cities_eqdc, state_borders)
+cities_eqdc$dist_to_state_km <- as.numeric(dist_to_state_border_m) / 1000 #m to km
+
+#Identify the 5 cities farthest from any state boundary
+top5_far_from_state <- cities_eqdc %>%
+  arrange(desc(dist_to_state_km)) %>%
+  slice(1:5) %>%
+  select(city, state_id, dist_to_state_km)
+
+flextable(top5_far_from_state)
+```
+
+
+# 2.3 - Distance to Mexico (km)
+
+For 2.3 we are interested in calculating the distance of each city to the Mexican border. To do this we need to isolate Mexico from the country objects. In addition to storing this data as part of the cities data.frame, produce a table (flextable) documenting the five cities farthest from a state border. Include only the city name, state, and distance.
+```{r}
+# using existing countries_eqdc object, which includes USA, Canada, and Mexico, all projected in EQDC.
+
+# Filter for Mexico only
+mexico <- countries_eqdc %>%
+  filter(sovereignt == "Mexico")  # use column name sovereignt == "Mexico"
+
+# Convert Mexico to a border line
+mexico_border <- mexico %>%
+  st_union() %>%
+  st_cast("MULTILINESTRING") #MULTILINESTRING to represent the border outline of Mexico
+
+# Calculate distances from cities to Mexico
+dist_to_mexico_m <- st_distance(cities_eqdc, mexico_border)
+cities_eqdc$dist_to_mexico_km <- as.numeric(dist_to_mexico_m) / 1000 #m to km
+
+# Create a table of the 5 cities farthest from the Mexican border
+top5_far_from_mexico <- cities_eqdc %>%
+  arrange(desc(dist_to_mexico_km)) %>%
+  slice(1:5) %>%
+  select(city, state_id, dist_to_mexico_km)
+
+flextable(top5_far_from_mexico)
+```
+
+
+# 2.4 Distance to Canada (km)
+
+For 2.4 we are interested in calculating the distance of each city to the Canadian border. To do this we need to isolate Canada from the country objects. In addition to storing this data as part of the cities data.frame, produce a table (flextable) documenting the five cities farthest from a state border. Include only the city name, state, and distance.
+```{r}
+# Filter for Canada, Convert Canada polygon to border lines
+canada_border <- countries_eqdc %>%
+  filter(name == "Canada") %>%
+  st_union() %>%
+  st_cast("MULTILINESTRING")
+
+#Compute distance from each city to the Canadian border
+cities_eqdc$dist_to_canada_km <- st_distance(cities_eqdc, canada_border) %>%
+  as.numeric() / 1000 #m to km
+
+# Create a table: 5 cities farthest from the Canadian border
+top5_far_from_canada <- cities_eqdc %>%
+  arrange(desc(dist_to_canada_km)) %>%
+  slice(1:5) %>%
+  select(city, state_id, dist_to_canada_km)
+
+flextable(top5_far_from_canada)
 
 
 ```
+
+
+# Question 3:
+
+In this section we will focus on visualizing the distance data you calculated above. You will be using ggplot to make your maps, ggrepl to label significant features, and gghighlight to emphasize important criteria.
 

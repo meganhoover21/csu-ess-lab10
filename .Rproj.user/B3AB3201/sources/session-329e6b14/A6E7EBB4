@@ -3,7 +3,7 @@
     "path": "C:/Users/samho/Desktop/ESS330/github/csu-ess-lab10/lab-10.qmd",
     "project_path": "lab-10.qmd",
     "type": "quarto_markdown",
-    "hash": "0",
+    "hash": "661246519",
     "contents": "",
     "dirty": false,
     "created": 1746131776055.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "153,0",
-        "scrollLine": "147"
+        "cursorPosition": "257,0",
+        "scrollLine": "251"
     },
     "folds": "",
-    "lastKnownWriteTime": 1746193686,
+    "lastKnownWriteTime": 1746196908,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1746193689187,
+    "last_content_update": 1746196909003,
     "read_only": false,
     "read_only_alternatives": []
 }
