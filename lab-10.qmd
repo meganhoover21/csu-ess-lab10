@@ -255,3 +255,218 @@ flextable(top5_far_from_canada)
 
 In this section we will focus on visualizing the distance data you calculated above. You will be using ggplot to make your maps, ggrepl to label significant features, and gghighlight to emphasize important criteria.
 
+
+# 3.1 Data
+Show the 3 continents, CONUS outline, state boundaries, and 10 largest USA cities (by population) on a single map
+
+Use geom_sf to plot your layers
+Use lty to change the line type and size to change line width
+Use ggrepel::geom_label_repel to label your cities
+```{r}
+# Filter the 10 Largest U.S. Cities by Population
+# Filter the 10 largest cities by population
+top_10_cities <- cities_eqdc %>%
+  arrange(desc(population)) %>%
+  slice(1:10)
+
+ # Prepare Spatial Layers for Plotting
+# Continents: already have countries_eqdc for USA, Canada, and Mexico.
+# CONUS Outline: This is the outline of the contiguous United States.
+# State Boundaries: The states_eqdc layer used earlier.
+# countries_eqdc, states_eqdc, and cities_eqdc
+
+# Add coordinates to your top_10_cities data frame before using it in geom_label_repel():
+top_10_cities_coords <- top_10_cities %>%
+  mutate(
+    coords = st_coordinates(geometry),
+    x = coords[, 1],
+    y = coords[, 2]
+  )
+
+#pass x and y to geom_label_repel():
+
+
+
+# Create the plot with all the layers
+ggplot() +
+  # Plot continents (USA, Canada, Mexico)
+  geom_sf(data = countries_eqdc, fill = "lightgray", color = "black", lwd = 0.5) +
+  
+  # Plot CONUS outline (only USA). lty= line type, lwd= line width
+  geom_sf(data = states_eqdc, fill = NA, color = "blue", lty = 2, lwd = 0.8) +
+  
+  # Plot state boundaries
+  geom_sf(data = states_eqdc, fill = NA, color = "black", lty = 1, lwd = 0.5) +
+  
+  # Plot the cities (top 10 largest cities by population)
+  geom_sf(data = top_10_cities, aes(color = city), size = 3) +
+  
+  # Use ggrepel to label the cities. avoids overlapping, but you can adjust padding with box.padding and point.padding
+  geom_label_repel(data = top_10_cities_coords, aes(x= x, y=y, label = city), 
+                   box.padding = 0.35, point.padding = 0.5,
+                   segment.color = "black", size = 3) +
+  
+  # Customize the theme
+  theme_minimal() +
+  
+  # Add a title
+  ggtitle("Map of 10 Largest U.S. Cities by Population") +
+  
+  # Adjusting the theme
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16),
+    legend.position = "none"  # Hide legend
+  )
+```
+
+
+# 3.2 City Distance from the Border
+
+Create a map that colors USA cities by their distance from the national border. In addition, re-draw and label the 5 cities that are farthest from the border.
+```{r}
+#Identify the 5 cities farthest from the border:
+farthest_5 <- cities_eqdc %>%
+  arrange(desc(dist_to_border_km)) %>%
+  slice(1:5) %>%
+  mutate(
+    coords = st_coordinates(geometry),
+    x = coords[, 1],
+    y = coords[, 2]
+  )
+
+# plot the new map
+ggplot() +
+  # Plot U.S. states
+  geom_sf(data = states_eqdc, fill = "white", color = "black", lwd = 0.3) +
+  
+  # Plot all cities colored by distance to border
+  geom_sf(data = cities_eqdc, aes(color = dist_to_border_km), size = 1, alpha = 0.7) +
+  
+  # Redraw and highlight the 5 farthest cities
+  geom_sf(data = farthest_5, color = "red", size = 2) +
+  
+  # Label those cities
+  geom_label_repel(
+    data = farthest_5,
+    aes(x = x, y = y, label = city),
+    size = 3,
+    box.padding = 0.3,
+    point.padding = 0.5,
+    segment.color = "black"
+  ) +
+  
+  # Scale and theme
+  scale_color_viridis_c(name = "Distance to Border (km)") +
+  theme_minimal() +
+  ggtitle("U.S. Cities Colored by Distance from National Border") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16))
+```
+
+
+# 3.3 City Distance from Nearest State
+
+Create a map that colors USA cities by their distance from the nearest state border. In addition, re-draw and label the 5 cities that are farthest from any border.
+```{r}
+# coloring U.S. cities by their distance to the nearest state border, not the national border. Color all cities by dist_to_state_km
+
+#Identify the 5 cities farthest from any state border:
+farthest_5_state <- cities_eqdc %>%
+  arrange(desc(dist_to_state_km)) %>%
+  slice(1:5) %>%
+  mutate(
+    coords = st_coordinates(geometry),
+    x = coords[, 1],
+    y = coords[, 2]
+  )
+
+#create map
+ggplot() +
+  # Plot U.S. state outlines
+  geom_sf(data = states_eqdc, fill = "white", color = "black", lwd = 0.3) +
+  
+  # Plot all cities, colored by distance to state border
+  geom_sf(data = cities_eqdc, aes(color = dist_to_state_km), size = 1, alpha = 0.7) +
+  
+  # Highlight the 5 farthest cities
+  geom_sf(data = farthest_5_state, color = "darkred", size = 2) +
+  
+  # Label the 5 cities
+  geom_label_repel(
+    data = farthest_5_state,
+    aes(x = x, y = y, label = city),
+    size = 3,
+    box.padding = 0.3,
+    point.padding = 0.5,
+    segment.color = "black"
+  ) +
+  
+  # Color scale and theme
+  scale_color_viridis_c(name = "Distance to State Border (km)") +
+  theme_minimal() +
+  ggtitle("U.S. Cities Colored by Distance from Nearest State Border") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16))
+```
+
+
+# 3.4 Equidistance boundary from Mexico and Canada
+
+Here we provide a little more challenge. Use gghighlight to identify the cities that are equal distance from the Canadian AND Mexican border 
+ 100 km.
+
+In addition, label the five (5) most populous cites in this zone.
+
+Hint: (create a new variable that finds the absolute difference between the distance to Mexico and the distance to Canada)
+```{r}
+# Create a new column for the absolute distance difference
+cities_eqdc <- cities_eqdc %>%
+  mutate(
+    dist_diff_km = abs(dist_to_canada_km - dist_to_mexico_km)
+  )
+
+
+# Filter for cities within 100 km difference
+equal_dist_cities <- cities_eqdc %>%
+  filter(dist_diff_km <= 100)
+
+# Get the 5 most populous cities in that zone
+top5_equal_dist <- equal_dist_cities %>%
+  arrange(desc(population)) %>%
+  slice(1:5) %>%
+  mutate(
+    coords = st_coordinates(geometry),
+    x = coords[,1],
+    y = coords[,2]
+  )
+
+# Plot with ggplot2, geom_sf, and gghighlight.use gghighlight to emphasize only the cities in the equidistant zone:
+ggplot(data = cities_eqdc) +
+  # Plot all cities with low alpha
+  geom_sf(aes(color = dist_diff_km), size = 1, alpha = 0.5) +
+  
+  # Highlight only cities within 100 km of equal distance
+  gghighlight(dist_diff_km <= 100, use_direct_label = FALSE) +
+  
+  # State borders for context
+  geom_sf(data = states_eqdc, fill = NA, color = "black", lwd = 0.3) +
+  
+  # Label the 5 most populous cities in the zone
+  geom_label_repel(
+    data = top5_equal_dist,
+    aes(x = x, y = y, label = city),
+    size = 3,
+    box.padding = 0.3,
+    point.padding = 0.5,
+    segment.color = "black"
+  ) +
+  
+  scale_color_viridis_c(name = "Distance Diff (km)") +
+  ggtitle("Cities ~Equidistant from Canada and Mexico (±100 km)") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, size = 15))
+
+# map shows:
+# Highlight only cities within ±100 km of equal distance to Mexico and Canada
+#Label the 5 most populous of those cities
+
+```
+
