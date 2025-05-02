@@ -1,25 +1,14 @@
-"0","library(flextable)
-"
-"2","Registered S3 method overwritten by 'data.table':
-  method           from
-  print.data.table     
-"
-"2","Registered S3 methods overwritten by 'htmltools':
-  method               from         
-  print.html           tools:rstudio
-  print.shiny.tag      tools:rstudio
-  print.shiny.tag.list tools:rstudio
-"
-"2","Registered S3 method overwritten by 'rmarkdown':
-  method         from
-  print.paged_df     
-"
-"2","
-Attaching package: ‘flextable’
-
-"
-"2","The following object is masked from ‘package:purrr’:
-
-    compose
-
-"
+"0","knitr::opts_chunk$set(echo = TRUE)"
+"0","# spatial data science"
+"0","library(tidyverse)"
+"0","library(sf)"
+"0","library(units)"
+"0",""
+"0","# Data"
+"0","library(AOI)"
+"0",""
+"0","# Visualization"
+"0","library(gghighlight)"
+"0","library(ggrepel)"
+"0","library(knitr)"
+"0","library(flextable)"
