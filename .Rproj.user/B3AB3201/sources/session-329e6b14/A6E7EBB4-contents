@@ -98,3 +98,58 @@ countries_eqdc <- st_transform(country_boundaries, crs = eqdc)
 
 ```
 
+
+# 1.4 Get city locations from the CSV file
+
+First go to this site and download the appropriate (free) dataset into the data directory of this project.
+
+Once downloaded, read it into your working session using readr::read_csv() and explore the dataset until you are comfortable with the information it contains.
+
+While this data has everything we want, it is not yet spatial. Convert the data.frame to a spatial object using st_as_sf and prescribing the coordinate variables and CRS (Hint what projection are the raw coordinates in?)
+
+Finally, remove cities in states not wanted and make sure the data is in a projected coordinate system suitable for distance measurements at the national scale:
+
+Congratulations! You now have three real-world, large datasets ready for analysis.
+```{r}
+# Read the CSV into R
+cities_df <- read_csv("C:/Users/samho/Desktop/ESS330/github/csu-ess-lab10/data/uscities.csv")
+
+# View structure and columns
+glimpse(cities_df)
+
+
+#Use sf::st_as_sf() to convert the data frame to an sf object using the latitude and longitude columns
+# Convert to sf object (WGS 84 = EPSG:4326)
+cities_sf <- st_as_sf(cities_df, coords = c("lng", "lat"), crs = 4326)
+
+# Optional: Define CONUS state abbreviations
+conus_states <- c(state.abb, "DC")  # 48 states + D.C.
+
+# Filter cities to only CONUS states
+cities_conus <- cities_sf[cities_sf$state_id %in% conus_states, ]
+
+# Reproject to EQDC
+cities_eqdc <- st_transform(cities_conus, crs = eqdc)
+
+#check crs
+st_crs(cities_eqdc)
+
+```
+
+
+# Question 2:
+
+Here we will focus on calculating the distance of each USA city to (1) the national border (2) the nearest state border (3) the Mexican border and (4) the Canadian border. You will need to manipulate you existing spatial geometries to do this using either st_union or st_combine depending on the situation. In all cases, since we are after distances to borders, we will need to cast (st_cast) our MULTIPPOLYGON geometries to MULTILINESTRING geometries. To perform these distance calculations we will use st_distance().
+
+
+# 2.1 Distance to USA Border (coastline or national) (km)
+
+For 2.2 we are interested in calculating the distance of each USA city to the USA border (coastline or national border). To do this we need all states to act as single unit. Convert the USA state boundaries to a MULTILINESTRING geometry in which the state boundaries are resolved. Please do this starting with the states object and NOT with a filtered country object. In addition to storing this distance data as part of the cities data.frame, produce a table (flextable) documenting the five cities farthest from a state border. Include only the city name, state, and distance.
+```{r}
+# Union all state boundaries into a single polygon
+usa_union <- st_union(states_eqdc)
+
+
+
+```
+
